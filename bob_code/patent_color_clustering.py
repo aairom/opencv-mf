@@ -292,11 +292,19 @@ class HierarchicalClusterForest:
         if len(self.active_nodes) <= target_k:
             return
 
+        # Vectorized feature matrix and active index tracking for maximum speed
         # Indexed Priority Queue of (pixel_count, node_id)
         min_heap: List[Tuple[int, int]] = [
             (self.nodes[nid].count, nid) for nid in self.active_nodes
         ]
         heapq.heapify(min_heap)
+
+        # Pre-allocate contiguous feature array for fast vector distance computation
+        max_possible_nodes = 2 * self.num_leaves
+        dim = next(iter(self._features.values())).shape[0]
+        feat_matrix = np.zeros((max_possible_nodes, dim), dtype=np.float64)
+        for nid, f in self._features.items():
+            feat_matrix[nid] = f
 
         while len(self.active_nodes) > target_k:
             # Step 218: Pop least-frequent active color
@@ -307,23 +315,17 @@ class HierarchicalClusterForest:
             else:
                 break
 
-            least_feat = self._features[least_id]
-
-            # Step 220 & 222: Find closest active neighbor
-            best_dist_sq = float("inf")
-            best_neighbor_id = -1
-
-            for other_id in self.active_nodes:
-                if other_id == least_id:
-                    continue
-                diff = self._features[other_id] - least_feat
-                dist_sq = np.dot(diff, diff)
-                if dist_sq < best_dist_sq:
-                    best_dist_sq = dist_sq
-                    best_neighbor_id = other_id
-
-            if best_neighbor_id == -1:
+            # Vectorized Step 220 & 222: Find closest active neighbor
+            active_list = np.array([nid for nid in self.active_nodes if nid != least_id], dtype=np.int64)
+            if active_list.size == 0:
                 break
+
+            active_feats = feat_matrix[active_list]
+            least_feat = feat_matrix[least_id]
+            diff = active_feats - least_feat
+            dists_sq = np.einsum("ij,ij->i", diff, diff)
+            best_idx = np.argmin(dists_sq)
+            best_neighbor_id = int(active_list[best_idx])
 
             # Step 224: Weighted centroid computation (Claims 4, 11, 18)
             node_u = self.nodes[least_id]
@@ -349,7 +351,9 @@ class HierarchicalClusterForest:
             node_v.parent = new_id
 
             self.nodes[new_id] = parent_node
-            self._features[new_id] = self._compute_feature(merged_color)
+            new_feat = self._compute_feature(merged_color)
+            self._features[new_id] = new_feat
+            feat_matrix[new_id] = new_feat
 
             # Update active cluster set
             self.active_nodes.remove(least_id)
