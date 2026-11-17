@@ -1,5 +1,0 @@
-Create a Python OpenCV implementation of the image processing and computer vision techniques described in IBM patent US11763422B2. Reference the patent documentation available at https://patents.google.com/patent/US11763422B2/ and the local PDF file located at _sources/US11763422.pdf. 
-
-Analyze the patent to identify the core algorithms, image processing operations, and technical specifications. Implement all key components using Python and OpenCV libraries, including any image transformations, feature detection, filtering, or analysis methods described in the patent claims and specification. 
-
-Ensure the implementation is functional, well-documented with comments explaining each step, and includes example usage demonstrating the primary functionality. Handle edge cases appropriately and optimize for clarity and correctness. If the patent describes multiple variants or operational modes, implement the primary method as described in the claims.
