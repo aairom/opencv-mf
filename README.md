@@ -8,7 +8,7 @@
 
 > 🆕 **Update to an omptized code generated with a more specific prompt could be found at: https://github.com/aairom/opencv-mf-2**
 >
-> 🛰️ Linkto Marc Fiammante's technical research documentation "**Why fast colour clustering works on tabular data: bit-plane binning, cross-product depth jumping and frequency-ordered merging**": https://github.com/aairom/opencv-mf-2/tree/main/MarcFiammante-ScientificArticle
+> 🛰️ Link to Marc Fiammante's technical research documentation "**Why fast colour clustering works on tabular data: bit-plane binning, cross-product depth jumping and frequency-ordered merging**": https://github.com/aairom/opencv-mf-2/tree/main/MarcFiammante-ScientificArticle
 
 ## 1. Technical Overview & Patent Architecture
 
